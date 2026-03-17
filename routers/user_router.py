@@ -23,3 +23,18 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
     return db_user
+
+@router.put("/{user_id}", response_model=UserResponse)
+def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
+    db_user = user_repo.get_user_by_id(db=db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+    return user_repo.update_user(db=db, db_user=db_user, user_update=user)
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = user_repo.get_user_by_id(db=db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+    user_repo.delete_user(db=db, db_user=db_user)
+    return None

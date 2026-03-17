@@ -24,3 +24,20 @@ def create_user(db: Session, user: UserCreate):
     db.commit() # Zatwierdzamy zmiany w bazie
     db.refresh(db_user) # Odświeżamy, żeby uzyskać wygenerowane ID
     return db_user
+
+# Funkcja aktualizująca dane użytkownika
+def update_user(db: Session, db_user: User, user_update: UserCreate):
+    db_user.imie = user_update.imie
+    db_user.nazwisko = user_update.nazwisko
+    db_user.email = user_update.email
+    db_user.rola = user_update.rola
+    db_user.haslo = user_update.haslo
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+# Funkcja usuwająca użytkownika z bazy
+def delete_user(db: Session, db_user: User):
+    db.delete(db_user)
+    db.commit()
+    return True
