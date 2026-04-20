@@ -158,7 +158,7 @@
             }; 
             try {
                 const token = localStorage.getItem('klubToken');
-                const res = await fetch('http://127.0.0.1:8000/events/obozy', {
+                const res = await fetch('http://lks-lochow-api.onrender.com/events/obozy', {
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify(payload)
@@ -180,7 +180,7 @@
             grid.innerHTML = 'Ładowanie obozów z bazy...'; 
             try {
                 const token = localStorage.getItem('klubToken');
-                const odp = await fetch('http://127.0.0.1:8000/events/obozy', { headers: { 'Authorization': 'Bearer ' + token }});
+                const odp = await fetch('http://lks-lochow-api.onrender.com/events/obozy', { headers: { 'Authorization': 'Bearer ' + token }});
                 const obozy = await odp.json();
                 
                 grid.innerHTML = ''; 
@@ -205,7 +205,7 @@
 
             try {
                 const token = localStorage.getItem('klubToken');
-                const res = await fetch(`http://127.0.0.1:8000/events/obozy/${obozId}/zapisy`, {
+                const res = await fetch(`http://lks-lochow-api.onrender.com/events/obozy/${obozId}/zapisy`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const zapisy = await res.json();
@@ -227,7 +227,7 @@
             if(!confirm("Na pewno usunąć ten obóz z bazy?")) return;
             try {
                 const token = localStorage.getItem('klubToken');
-                await fetch(`http://127.0.0.1:8000/events/obozy/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }});
+                await fetch(`http://lks-lochow-api.onrender.com/events/obozy/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }});
                 renderujObozyAdmin(); 
             } catch(e) { alert("Błąd usuwania"); }
         }
@@ -238,7 +238,7 @@
             grid.innerHTML = 'Szukanie ofert...'; 
             try {
                 const token = localStorage.getItem('klubToken');
-                const odp = await fetch('http://127.0.0.1:8000/events/obozy', { headers: { 'Authorization': 'Bearer ' + token }});
+                const odp = await fetch('http://lks-lochow-api.onrender.com/events/obozy', { headers: { 'Authorization': 'Bearer ' + token }});
                 const wszystkieObozy = await odp.json();
                 
                 const dedykowaneObozy = wszystkieObozy.filter(o => o.grupa === 'ALL' || o.grupa === user.przypisany_trener); 
@@ -247,7 +247,7 @@
                 if(dedykowaneObozy.length === 0) { grid.innerHTML = '<div class="text-muted py-4">Obecnie nie ma obozów dla Twojej grupy.</div>'; return; } 
                 
                 for (let o of dedykowaneObozy) { 
-                    const resZapisy = await fetch(`http://127.0.0.1:8000/events/obozy/${o.id}/zapisy`, { headers: { 'Authorization': 'Bearer ' + token }});
+                    const resZapisy = await fetch(`http://lks-lochow-api.onrender.com/events/obozy/${o.id}/zapisy`, { headers: { 'Authorization': 'Bearer ' + token }});
                     const zapisy = await resZapisy.json();
                     const czyJuzZapisano = zapisy.some(z => z.user_id === user.id);
 
@@ -276,7 +276,7 @@
 
             try {
                 const token = localStorage.getItem('klubToken');
-                const res = await fetch(`http://127.0.0.1:8000/events/obozy/${obozId}/zapisy`, {
+                const res = await fetch(`http://lks-lochow-api.onrender.com/events/obozy/${obozId}/zapisy`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify(payload)
@@ -298,7 +298,7 @@
             const select = document.getElementById('ob-grupa'); 
             select.innerHTML = '<option value="ALL" selected>Wszyscy (Cały Klub)</option>'; 
             try { 
-                const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); 
+                const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); 
                 const wszyscy = await odp.json(); 
                 wszyscy.filter(u => u.rola === 'trener').forEach(t => { 
                     let pNazwa = pobierzIdentyfikatorTrenera(t); 
@@ -314,7 +314,7 @@
             e.preventDefault(); 
             const payload = { nazwa: document.getElementById('mag-nazwa').value, ilosc: parseInt(document.getElementById('mag-ilosc').value) }; 
             try {
-                await fetch('http://127.0.0.1:8000/events/magazyn/sprzet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                await fetch('http://lks-lochow-api.onrender.com/events/magazyn/sprzet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 document.getElementById('modal-dodaj-sprzet').classList.add('view-hidden'); 
                 document.getElementById('mag-nazwa').value = ''; document.getElementById('mag-ilosc').value = '';
                 renderujMagazyn(); 
@@ -327,13 +327,13 @@
             spSelect.innerHTML = '<option>Ładowanie...</option>'; trSelect.innerHTML = '<option>Ładowanie...</option>'; 
             document.getElementById('modal-wydaj-sprzet').classList.remove('view-hidden');
             try { 
-                const resSprzet = await fetch('http://127.0.0.1:8000/events/magazyn/sprzet');
+                const resSprzet = await fetch('http://lks-lochow-api.onrender.com/events/magazyn/sprzet');
                 const sprzet = await resSprzet.json();
                 spSelect.innerHTML = '';
                 sprzet.forEach(s => { spSelect.innerHTML += `<option value="${s.id}" data-nazwa="${s.nazwa}">${s.nazwa} (Dostępne: ${s.ilosc})</option>`; }); 
 
                 const token = localStorage.getItem('klubToken');
-                const resUsers = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + token } }); 
+                const resUsers = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + token } }); 
                 const users = await resUsers.json(); 
                 trSelect.innerHTML = '';
                 users.filter(u=>u.rola==='trener').forEach(t => { trSelect.innerHTML += `<option value="${t.nazwisko}">${t.imie} ${t.nazwisko}</option>`; }); 
@@ -351,7 +351,7 @@
             const payload = { sprzet_id: spId, nazwa: spNazwa, ilosc: ilosc, trener: trener };
 
             try {
-                const res = await fetch('http://127.0.0.1:8000/events/magazyn/wydania', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const res = await fetch('http://lks-lochow-api.onrender.com/events/magazyn/wydania', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if(res.ok){
                     document.getElementById('modal-wydaj-sprzet').classList.add('view-hidden'); 
                     document.getElementById('wyd-ilosc').value = '';
@@ -366,9 +366,9 @@
             const lista = document.getElementById('admin-magazyn-lista'); 
             lista.innerHTML = '<tr><td colspan="3" class="text-center">Ładowanie z bazy...</td></tr>'; 
             try {
-                const resSprzet = await fetch('http://127.0.0.1:8000/events/magazyn/sprzet');
+                const resSprzet = await fetch('http://lks-lochow-api.onrender.com/events/magazyn/sprzet');
                 const sprzet = await resSprzet.json();
-                const resWydania = await fetch('http://127.0.0.1:8000/events/magazyn/wydania');
+                const resWydania = await fetch('http://lks-lochow-api.onrender.com/events/magazyn/wydania');
                 const wydania = await resWydania.json();
 
                 lista.innerHTML = ''; 
@@ -385,7 +385,7 @@
             const lista = document.getElementById('lista-sprzetu-trenera'); 
             lista.innerHTML = '<tr><td colspan="2" class="text-center">Ładowanie z bazy...</td></tr>'; 
             try {
-                const resWydania = await fetch('http://127.0.0.1:8000/events/magazyn/wydania');
+                const resWydania = await fetch('http://lks-lochow-api.onrender.com/events/magazyn/wydania');
                 const wydania = await resWydania.json();
                 lista.innerHTML = ''; 
                 let mojeWydania = wydania.filter(w => w.trener === user.nazwisko); 
@@ -405,7 +405,7 @@
                 opis: document.getElementById('k-opis').value
             }; 
             try {
-                await fetch(`http://127.0.0.1:8000/events/konspekty?autor_id=${user.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                await fetch(`http://lks-lochow-api.onrender.com/events/konspekty?autor_id=${user.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 document.getElementById('konspekt-form').reset(); 
                 document.getElementById('formularz-konspektu').classList.add('view-hidden'); 
                 renderujKonspekty(); 
@@ -416,7 +416,7 @@
             const lista = document.getElementById('lista-konspektow'); 
             lista.innerHTML = '<div class="col-12 text-center my-4">Ładowanie z bazy danych...</div>'; 
             try {
-                const res = await fetch('http://127.0.0.1:8000/events/konspekty');
+                const res = await fetch('http://lks-lochow-api.onrender.com/events/konspekty');
                 const konspektyBaza = await res.json();
                 lista.innerHTML = ''; 
                 if (konspektyBaza.length === 0) { lista.innerHTML = '<div class="col-12 text-muted">Brak konspektów.</div>'; return; } 
@@ -430,7 +430,7 @@
             try { 
                 const u = JSON.parse(localStorage.getItem('zalogowanyUser')); 
                 let mKlucz = pobierzIdentyfikatorTrenera(u); 
-                const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); 
+                const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); 
                 const wszyscy = await odp.json(); 
                 const mojaGrupa = wszyscy.filter(z => z.rola === 'rodzic' && z.przypisany_trener === mKlucz); 
                 select.innerHTML = '<option value="" disabled selected>-- Wybierz --</option>'; 
@@ -450,7 +450,7 @@
                 uwagi: document.getElementById('o-uwagi').value 
             }; 
             try {
-                await fetch(`http://127.0.0.1:8000/events/ratings?trener_id=${user.id}`, { 
+                await fetch(`http://lks-lochow-api.onrender.com/events/ratings?trener_id=${user.id}`, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify(payload) 
@@ -465,7 +465,7 @@
             const lista = document.getElementById('lista-ocen'); 
             lista.innerHTML = '<div class="col-12 text-center my-4">Pobieranie ocen z bazy...</div>'; 
             try {
-                const res = await fetch('http://127.0.0.1:8000/events/ratings');
+                const res = await fetch('http://lks-lochow-api.onrender.com/events/ratings');
                 const oceny = await res.json();
                 lista.innerHTML = ''; 
                 if (oceny.length === 0) { lista.innerHTML = '<div class="col-12 text-muted">Brak ocen w systemie.</div>'; return; } 
@@ -480,7 +480,7 @@
         async function zaladujPanelAdmina() { 
             try { 
                 const token = localStorage.getItem('klubToken');
-                const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + token } }); 
+                const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + token } }); 
                 const users = await odp.json(); 
                 const tbody = document.getElementById('admin-table-body'); tbody.innerHTML = ''; 
                 const tylkoRodzice = users.filter(u => u.rola === 'rodzic'); 
@@ -510,26 +510,26 @@
         async function akceptujRodzica(id) {
             try {
                 const token = localStorage.getItem('klubToken');
-                await fetch(`http://127.0.0.1:8000/users/${id}/akceptuj`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + token } });
+                await fetch(`http://lks-lochow-api.onrender.com/users/${id}/akceptuj`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + token } });
                 alert("Konto zaakceptowane! Rodzic może się logować.");
                 zaladujPanelAdmina();
             } catch(e) { alert("Błąd akceptacji"); }
         }
 
-        async function zapiszPrzypisanieTrenera(e) { e.preventDefault(); let id = document.getElementById('admin-trener-userid').value; let nazwaTrenera = document.getElementById('admin-trener-select').value; try { await fetch(`http://127.0.0.1:8000/users/${id}/trener?nazwa_trenera=${encodeURIComponent(nazwaTrenera)}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); document.getElementById('admin-trener-modal').classList.add('view-hidden'); zaladujPanelAdmina(); } catch(e) {} }
+        async function zapiszPrzypisanieTrenera(e) { e.preventDefault(); let id = document.getElementById('admin-trener-userid').value; let nazwaTrenera = document.getElementById('admin-trener-select').value; try { await fetch(`http://lks-lochow-api.onrender.com/users/${id}/trener?nazwa_trenera=${encodeURIComponent(nazwaTrenera)}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); document.getElementById('admin-trener-modal').classList.add('view-hidden'); zaladujPanelAdmina(); } catch(e) {} }
 
-        async function zaladujKadreTrenerska() { try { const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const users = await odp.json(); const tbody = document.getElementById('admin-trenerzy-table-body'); tbody.innerHTML = ''; const tylkoTrenerzy = users.filter(u => u.rola === 'trener'); if(tylkoTrenerzy.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Brak trenerów.</td></tr>'; return; } tylkoTrenerzy.forEach(t => { let grupaBadge = t.przypisany_trener ? `<span class="badge bg-info text-dark">${t.przypisany_trener}</span>` : `<span class="badge bg-secondary">Brak zdefiniowanej grupy</span>`; tbody.innerHTML += `<tr><td><div class="fw-bold text-dark"><i class="bi bi-person-badge text-primary me-2"></i> ${t.imie} ${t.nazwisko}</div></td><td>${grupaBadge}</td><td class="text-muted small">${t.email}</td><td class="text-end"><button class="btn btn-sm btn-outline-danger" onclick="usunUsera(${t.id}, true)"><i class="bi bi-trash"></i> Usuń</button></td></tr>`; }); } catch(e) {} }
-        async function zapiszNowegoTrenera(e) { e.preventDefault(); const przypisanaGrupa = document.getElementById('nt-grupa').value; const payload = { imie: document.getElementById('nt-imie').value, nazwisko: document.getElementById('nt-nazwisko').value, email: document.getElementById('nt-email').value, haslo: document.getElementById('nt-haslo').value, rola: "trener" }; try { const res = await fetch('http://127.0.0.1:8000/users/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (res.ok) { const createdUser = await res.json(); if (przypisanaGrupa) { await fetch(`http://127.0.0.1:8000/users/${createdUser.id}/trener?nazwa_trenera=${encodeURIComponent(przypisanaGrupa)}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); } document.getElementById('admin-dodaj-trenera-modal').classList.add('view-hidden'); zaladujKadreTrenerska(); } } catch (err) { } }
-        async function otworzModalTrenera(userId, imie) { document.getElementById('admin-trener-userid').value = userId; const select = document.getElementById('admin-trener-select'); select.innerHTML = '<option value="">Ładowanie...</option>'; document.getElementById('admin-trener-modal').classList.remove('view-hidden'); try { const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const trenerzy = wszyscy.filter(t => t.rola === 'trener'); select.innerHTML = '<option value="" disabled selected>-- Wybierz grupę i trenera --</option>'; trenerzy.forEach(t => { let pelnaNazwa = pobierzIdentyfikatorTrenera(t); select.innerHTML += `<option value="${pelnaNazwa}">${pelnaNazwa}</option>`; }); } catch(e) {} }
+        async function zaladujKadreTrenerska() { try { const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const users = await odp.json(); const tbody = document.getElementById('admin-trenerzy-table-body'); tbody.innerHTML = ''; const tylkoTrenerzy = users.filter(u => u.rola === 'trener'); if(tylkoTrenerzy.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Brak trenerów.</td></tr>'; return; } tylkoTrenerzy.forEach(t => { let grupaBadge = t.przypisany_trener ? `<span class="badge bg-info text-dark">${t.przypisany_trener}</span>` : `<span class="badge bg-secondary">Brak zdefiniowanej grupy</span>`; tbody.innerHTML += `<tr><td><div class="fw-bold text-dark"><i class="bi bi-person-badge text-primary me-2"></i> ${t.imie} ${t.nazwisko}</div></td><td>${grupaBadge}</td><td class="text-muted small">${t.email}</td><td class="text-end"><button class="btn btn-sm btn-outline-danger" onclick="usunUsera(${t.id}, true)"><i class="bi bi-trash"></i> Usuń</button></td></tr>`; }); } catch(e) {} }
+        async function zapiszNowegoTrenera(e) { e.preventDefault(); const przypisanaGrupa = document.getElementById('nt-grupa').value; const payload = { imie: document.getElementById('nt-imie').value, nazwisko: document.getElementById('nt-nazwisko').value, email: document.getElementById('nt-email').value, haslo: document.getElementById('nt-haslo').value, rola: "trener" }; try { const res = await fetch('http://lks-lochow-api.onrender.com/users/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (res.ok) { const createdUser = await res.json(); if (przypisanaGrupa) { await fetch(`http://lks-lochow-api.onrender.com/users/${createdUser.id}/trener?nazwa_trenera=${encodeURIComponent(przypisanaGrupa)}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); } document.getElementById('admin-dodaj-trenera-modal').classList.add('view-hidden'); zaladujKadreTrenerska(); } } catch (err) { } }
+        async function otworzModalTrenera(userId, imie) { document.getElementById('admin-trener-userid').value = userId; const select = document.getElementById('admin-trener-select'); select.innerHTML = '<option value="">Ładowanie...</option>'; document.getElementById('admin-trener-modal').classList.remove('view-hidden'); try { const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const trenerzy = wszyscy.filter(t => t.rola === 'trener'); select.innerHTML = '<option value="" disabled selected>-- Wybierz grupę i trenera --</option>'; trenerzy.forEach(t => { let pelnaNazwa = pobierzIdentyfikatorTrenera(t); select.innerHTML += `<option value="${pelnaNazwa}">${pelnaNazwa}</option>`; }); } catch(e) {} }
 
-        async function zaladujZawodników() { const user = JSON.parse(localStorage.getItem('zalogowanyUser')); const grid = document.getElementById('trener-zawodnicy-grid'); let mojKlucz = pobierzIdentyfikatorTrenera(user); try { const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); grid.innerHTML = ''; const mojaGrupa = wszyscy.filter(u => u.rola === 'rodzic' && u.przypisany_trener === mojKlucz); if (mojaGrupa.length === 0) { grid.innerHTML = '<div class="col-12 text-center text-muted py-4">Brak przypisanych zawodników do Twojej grupy.</div>'; return; } mojaGrupa.forEach(u => { let statusBadan = sprawdzStatusBadan(u.badania_koniec); let bKoniec = u.badania_koniec ? u.badania_koniec : ''; grid.innerHTML += `<div class="col-md-4 col-sm-6"><div class="card h-100 p-4 text-center"><div class="fs-1 text-success mb-2"><i class="bi bi-person-circle"></i></div><h5 class="fw-bold m-0">${u.imie_dziecka} ${u.nazwisko_dziecka}</h5><p class="small text-muted mb-3"><span class="badge bg-secondary me-1">Rocznik: ${u.rocznik_dziecka}</span><br><div class="mt-2">${statusBadan}</div></p><div class="d-flex gap-2 justify-content-center mt-2 mb-3"><button class="btn btn-sm btn-outline-danger w-50" onclick="pokazKarteMedyczna(${u.id}, '${u.imie_dziecka}', '${bKoniec}')"><i class="bi bi-heart-pulse"></i> Karta</button><button class="btn btn-sm btn-outline-success w-50" onclick="otworzModalBadan(${u.id}, '${u.imie_dziecka}', '${u.badania_start}', '${u.badania_koniec}')"><i class="bi bi-file-medical"></i> Badania</button></div><div class="border-top pt-3 mt-auto text-start bg-light rounded p-2"><p class="small m-0 fw-bold text-dark"><i class="bi bi-person-heart"></i> Rodzic: ${u.imie}</p><p class="small m-0 text-muted mt-1"><i class="bi bi-envelope-at"></i> ${u.email}</p></div></div></div>`; }); } catch(e) {} }
+        async function zaladujZawodników() { const user = JSON.parse(localStorage.getItem('zalogowanyUser')); const grid = document.getElementById('trener-zawodnicy-grid'); let mojKlucz = pobierzIdentyfikatorTrenera(user); try { const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); grid.innerHTML = ''; const mojaGrupa = wszyscy.filter(u => u.rola === 'rodzic' && u.przypisany_trener === mojKlucz); if (mojaGrupa.length === 0) { grid.innerHTML = '<div class="col-12 text-center text-muted py-4">Brak przypisanych zawodników do Twojej grupy.</div>'; return; } mojaGrupa.forEach(u => { let statusBadan = sprawdzStatusBadan(u.badania_koniec); let bKoniec = u.badania_koniec ? u.badania_koniec : ''; grid.innerHTML += `<div class="col-md-4 col-sm-6"><div class="card h-100 p-4 text-center"><div class="fs-1 text-success mb-2"><i class="bi bi-person-circle"></i></div><h5 class="fw-bold m-0">${u.imie_dziecka} ${u.nazwisko_dziecka}</h5><p class="small text-muted mb-3"><span class="badge bg-secondary me-1">Rocznik: ${u.rocznik_dziecka}</span><br><div class="mt-2">${statusBadan}</div></p><div class="d-flex gap-2 justify-content-center mt-2 mb-3"><button class="btn btn-sm btn-outline-danger w-50" onclick="pokazKarteMedyczna(${u.id}, '${u.imie_dziecka}', '${bKoniec}')"><i class="bi bi-heart-pulse"></i> Karta</button><button class="btn btn-sm btn-outline-success w-50" onclick="otworzModalBadan(${u.id}, '${u.imie_dziecka}', '${u.badania_start}', '${u.badania_koniec}')"><i class="bi bi-file-medical"></i> Badania</button></div><div class="border-top pt-3 mt-auto text-start bg-light rounded p-2"><p class="small m-0 fw-bold text-dark"><i class="bi bi-person-heart"></i> Rodzic: ${u.imie}</p><p class="small m-0 text-muted mt-1"><i class="bi bi-envelope-at"></i> ${u.email}</p></div></div></div>`; }); } catch(e) {} }
 
         async function zapiszKarteRodzica(e){ 
             e.preventDefault(); 
             const user = JSON.parse(localStorage.getItem('zalogowanyUser')); 
             const payload = { koszulka: document.getElementById('kz-koszulka').value, dres: document.getElementById('kz-dres').value, alergie: document.getElementById('kz-alergie').value, telefon: document.getElementById('kz-telefon').value }; 
             try {
-                const res = await fetch(`http://127.0.0.1:8000/users/${user.id}/karta`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') }, body: JSON.stringify(payload) });
+                const res = await fetch(`http://lks-lochow-api.onrender.com/users/${user.id}/karta`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') }, body: JSON.stringify(payload) });
                 if(res.ok) {
                     alert("Karta Medyczna zapisana bezpiecznie na serwerze!");
                     user.rozmiar_koszulki = payload.koszulka; user.rozmiar_dresu = payload.dres; user.alergie = payload.alergie; user.telefon_ice = payload.telefon;
@@ -555,7 +555,7 @@
             document.getElementById('modal-karta-medyczna').classList.remove('view-hidden'); 
 
             try {
-                const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } });
+                const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } });
                 const wszyscy = await odp.json();
                 const u = wszyscy.find(x => x.id === userId);
 
@@ -577,7 +577,7 @@
             document.getElementById('modal-badania').classList.remove('view-hidden');
         }
         
-        async function zapiszBadania(e) { e.preventDefault(); let id = document.getElementById('badania-userid').value; let payload = { badania_start: document.getElementById('badania-start').value, badania_koniec: document.getElementById('badania-koniec').value }; try { let res = await fetch(`http://127.0.0.1:8000/users/${id}/badania`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') }, body: JSON.stringify(payload) }); if(res.ok) { document.getElementById('modal-badania').classList.add('view-hidden'); zaladujZawodników(); } } catch(e) { alert("Błąd."); } }
+        async function zapiszBadania(e) { e.preventDefault(); let id = document.getElementById('badania-userid').value; let payload = { badania_start: document.getElementById('badania-start').value, badania_koniec: document.getElementById('badania-koniec').value }; try { let res = await fetch(`http://lks-lochow-api.onrender.com/users/${id}/badania`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') }, body: JSON.stringify(payload) }); if(res.ok) { document.getElementById('modal-badania').classList.add('view-hidden'); zaladujZawodników(); } } catch(e) { alert("Błąd."); } }
         function sprawdzStatusBadan(koniec) { if(!koniec || koniec === 'null' || koniec === 'undefined') return `<span class="badge bg-danger">Brak badań</span>`; let dzis = new Date(); let dataKonca = new Date(koniec); if(dataKonca < dzis) return `<span class="badge bg-danger">Wygasły</span>`; return `<span class="badge bg-success">Ważne do: ${koniec}</span>`; }
 
         const nazwyMiesiecy = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec"]; 
@@ -593,7 +593,7 @@
             
             try {
                 const token = localStorage.getItem('klubToken');
-                const odp = await fetch(`http://127.0.0.1:8000/users/${userId}/platnosci`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const odp = await fetch(`http://lks-lochow-api.onrender.com/users/${userId}/platnosci`, { headers: { 'Authorization': 'Bearer ' + token } });
                 const platnosciZSerwera = await odp.json();
                 
                 grid.innerHTML = ''; 
@@ -611,7 +611,7 @@
         async function zmienStatusWplaty(userId, idx) { 
             try {
                 const token = localStorage.getItem('klubToken');
-                await fetch(`http://127.0.0.1:8000/users/${userId}/platnosci/${idx}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + token } });
+                await fetch(`http://lks-lochow-api.onrender.com/users/${userId}/platnosci/${idx}`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + token } });
                 await renderujGuzikiMiesiecy(userId); 
             } catch(e) { alert("Błąd połączenia z serwerem"); }
         } 
@@ -623,7 +623,7 @@
             
             try {
                 const token = localStorage.getItem('klubToken');
-                const odp = await fetch(`http://127.0.0.1:8000/users/${user.id}/platnosci`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const odp = await fetch(`http://lks-lochow-api.onrender.com/users/${user.id}/platnosci`, { headers: { 'Authorization': 'Bearer ' + token } });
                 const platnosciZSerwera = await odp.json();
                 
                 grid.innerHTML = ''; 
@@ -636,14 +636,14 @@
         }
 
         function zamknijModaleAdmina() { document.getElementById('admin-trener-modal').classList.add('view-hidden'); document.getElementById('admin-platnosc-modal').classList.add('view-hidden'); }
-        async function usunUsera(id, toTrener) { if(!confirm(`Usunąć trwale?`)) return; try { await fetch(`http://127.0.0.1:8000/users/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); if(toTrener) zaladujKadreTrenerska(); else zaladujPanelAdmina(); } catch(e) {} }
+        async function usunUsera(id, toTrener) { if(!confirm(`Usunąć trwale?`)) return; try { await fetch(`http://lks-lochow-api.onrender.com/users/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); if(toTrener) zaladujKadreTrenerska(); else zaladujPanelAdmina(); } catch(e) {} }
 
-        async function pobierzPlikPZPN() { try { const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const users = await odp.json(); let csv = "Imie;Nazwisko;Rocznik;Pesel;Trener\n"; users.filter(u => u.rola === 'rodzic').forEach(u => { let pesel = u.rocznik_dziecka ? u.rocznik_dziecka.toString().slice(-2) + "051201234" : "BRAK"; csv += `${u.imie_dziecka};${u.nazwisko_dziecka};${u.rocznik_dziecka};${pesel};${u.przypisany_trener || 'Brak'}\n`; }); let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "PZPN.csv"; link.click(); } catch(e) {} }
+        async function pobierzPlikPZPN() { try { const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const users = await odp.json(); let csv = "Imie;Nazwisko;Rocznik;Pesel;Trener\n"; users.filter(u => u.rola === 'rodzic').forEach(u => { let pesel = u.rocznik_dziecka ? u.rocznik_dziecka.toString().slice(-2) + "051201234" : "BRAK"; csv += `${u.imie_dziecka};${u.nazwisko_dziecka};${u.rocznik_dziecka};${pesel};${u.przypisany_trener || 'Brak'}\n`; }); let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "PZPN.csv"; link.click(); } catch(e) {} }
 
-        let kalendarz = null; window.lokalneWydarzenia = []; let bazaPowolan = JSON.parse(localStorage.getItem('klubPowolania')) || {}; function renderujKalendarz() { setTimeout(() => { let el = document.getElementById('calendar'); if(kalendarz) kalendarz.destroy(); const u = JSON.parse(localStorage.getItem('zalogowanyUser')); kalendarz = new FullCalendar.Calendar(el, { initialView: 'dayGridMonth', locale: 'pl', headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listWeek' }, dateClick: function(info) { if (u && (u.rola === 'trener' || u.rola === 'admin')) { document.getElementById('ev-data-kliknieta').value = info.dateStr; document.getElementById('event-modal-overlay').classList.remove('view-hidden'); } }, eventContent: function(arg) { let start = arg.event.start ? arg.event.start.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''; let end = arg.event.end ? arg.event.end.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''; let timeText = end ? `${start} - ${end}` : start; let powolanieHTML = ''; if (u.rola === 'rodzic' && arg.event.backgroundColor === '#dc3545') { let kluczMeczu = arg.event.title + '_' + arg.event.startStr.split('T')[0]; let listaPowolanych = bazaPowolan[kluczMeczu] || []; let nazwaMojegoDziecka = `${u.imie_dziecka} ${u.nazwisko_dziecka}`; if (listaPowolanych.includes(nazwaMojegoDziecka)) { powolanieHTML = `<div class="badge bg-white text-danger border border-danger w-100 mt-1" style="font-size:0.6rem;">⚽ POWOŁANY!</div>`; } else { return { html: `` }; } } return { html: `<div class="p-1" style="line-height: 1.2; overflow: hidden;"><div class="fw-bold text-truncate">${arg.event.title}</div><div class="small opacity-75">${timeText}</div>${powolanieHTML}</div>` }; }, events: async function(fetchInfo, sc, fc) { try { const odp = await fetch('http://127.0.0.1:8000/events/'); const w = await odp.json(); let zBazy = w.map(e => ({ id: e.id, title: e.nazwa, start: e.data_rozpoczecia, end: e.data_zakonczenia, backgroundColor: e.typ === 'mecz' ? '#dc3545' : '#198754' })); sc(zBazy.concat(window.lokalneWydarzenia)); } catch (e) { sc(window.lokalneWydarzenia); } } }); kalendarz.render(); }, 150); } function zamknijModal() { document.getElementById('event-modal-overlay').classList.add('view-hidden'); document.getElementById('event-form').reset(); document.getElementById('cykl-koniec-box').classList.add('view-hidden'); document.getElementById('ev-powolania-box').classList.add('view-hidden'); } function toggleCykl() { const c = document.getElementById('ev-cykl'), b = document.getElementById('cykl-koniec-box'); if(c.checked) { b.classList.remove('view-hidden'); document.getElementById('ev-koniec').required = true; } else { b.classList.add('view-hidden'); document.getElementById('ev-koniec').required = false; } } async function obslugaTypuZajec() { let typ = document.getElementById('ev-typ').value; let powBox = document.getElementById('ev-powolania-box'); let listaBox = document.getElementById('ev-lista-zawodnikow'); if (typ === 'mecz') { powBox.classList.remove('view-hidden'); listaBox.innerHTML = 'Ładowanie zawodników...'; try { const u = JSON.parse(localStorage.getItem('zalogowanyUser')); let mKlucz = pobierzIdentyfikatorTrenera(u); const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const mojaGrupa = wszyscy.filter(z => z.rola === 'rodzic' && z.przypisany_trener === mKlucz); listaBox.innerHTML = ''; mojaGrupa.forEach(z => { let inaz = `${z.imie_dziecka} ${z.nazwisko_dziecka}`; listaBox.innerHTML += `<div class="form-check"><input class="form-check-input check-powolanie" type="checkbox" value="${inaz}" id="chk-${z.id}"><label class="form-check-label" for="chk-${z.id}">${inaz}</label></div>`; }); } catch(e) {} } else { powBox.classList.add('view-hidden'); } } document.getElementById('event-form').addEventListener('submit', function(e) { e.preventDefault(); let nazwa = document.getElementById('ev-nazwa').value; let typ = document.getElementById('ev-typ').value; let czasStart = document.getElementById('ev-czas-start').value; let czasKoniec = document.getElementById('ev-czas-koniec').value; let dataKliknieta = document.getElementById('ev-data-kliknieta').value, powtarzaj = document.getElementById('ev-cykl').checked, dataKoniec = document.getElementById('ev-koniec').value; let bgColor = typ === 'mecz' ? '#dc3545' : '#198754'; let noweTreningi = []; let powolaniWykaz = []; if (typ === 'mecz') { document.querySelectorAll('.check-powolanie:checked').forEach(cb => powolaniWykaz.push(cb.value)); } function formatujLokalnie(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; } let aktualnaData = new Date(dataKliknieta + 'T00:00:00'); let koncowaData = dataKoniec ? new Date(dataKoniec + 'T23:59:59') : aktualnaData; while (aktualnaData <= koncowaData) { let sTime = formatujLokalnie(aktualnaData) + 'T' + czasStart + ':00'; let eTime = formatujLokalnie(aktualnaData) + 'T' + czasKoniec + ':00'; noweTreningi.push({ title: nazwa, start: sTime, end: eTime, backgroundColor: bgColor, id: 'temp-' + Math.random() }); if (typ === 'mecz') { let klucz = nazwa + '_' + formatujLokalnie(aktualnaData); bazaPowolan[klucz] = powolaniWykaz; } if (!powtarzaj) break; aktualnaData.setDate(aktualnaData.getDate() + 7); } localStorage.setItem('klubPowolania', JSON.stringify(bazaPowolan)); window.lokalneWydarzenia.push(...noweTreningi); kalendarz.refetchEvents(); zamknijModal(); });
+        let kalendarz = null; window.lokalneWydarzenia = []; let bazaPowolan = JSON.parse(localStorage.getItem('klubPowolania')) || {}; function renderujKalendarz() { setTimeout(() => { let el = document.getElementById('calendar'); if(kalendarz) kalendarz.destroy(); const u = JSON.parse(localStorage.getItem('zalogowanyUser')); kalendarz = new FullCalendar.Calendar(el, { initialView: 'dayGridMonth', locale: 'pl', headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listWeek' }, dateClick: function(info) { if (u && (u.rola === 'trener' || u.rola === 'admin')) { document.getElementById('ev-data-kliknieta').value = info.dateStr; document.getElementById('event-modal-overlay').classList.remove('view-hidden'); } }, eventContent: function(arg) { let start = arg.event.start ? arg.event.start.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''; let end = arg.event.end ? arg.event.end.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'}) : ''; let timeText = end ? `${start} - ${end}` : start; let powolanieHTML = ''; if (u.rola === 'rodzic' && arg.event.backgroundColor === '#dc3545') { let kluczMeczu = arg.event.title + '_' + arg.event.startStr.split('T')[0]; let listaPowolanych = bazaPowolan[kluczMeczu] || []; let nazwaMojegoDziecka = `${u.imie_dziecka} ${u.nazwisko_dziecka}`; if (listaPowolanych.includes(nazwaMojegoDziecka)) { powolanieHTML = `<div class="badge bg-white text-danger border border-danger w-100 mt-1" style="font-size:0.6rem;">⚽ POWOŁANY!</div>`; } else { return { html: `` }; } } return { html: `<div class="p-1" style="line-height: 1.2; overflow: hidden;"><div class="fw-bold text-truncate">${arg.event.title}</div><div class="small opacity-75">${timeText}</div>${powolanieHTML}</div>` }; }, events: async function(fetchInfo, sc, fc) { try { const odp = await fetch('http://lks-lochow-api.onrender.com/events/'); const w = await odp.json(); let zBazy = w.map(e => ({ id: e.id, title: e.nazwa, start: e.data_rozpoczecia, end: e.data_zakonczenia, backgroundColor: e.typ === 'mecz' ? '#dc3545' : '#198754' })); sc(zBazy.concat(window.lokalneWydarzenia)); } catch (e) { sc(window.lokalneWydarzenia); } } }); kalendarz.render(); }, 150); } function zamknijModal() { document.getElementById('event-modal-overlay').classList.add('view-hidden'); document.getElementById('event-form').reset(); document.getElementById('cykl-koniec-box').classList.add('view-hidden'); document.getElementById('ev-powolania-box').classList.add('view-hidden'); } function toggleCykl() { const c = document.getElementById('ev-cykl'), b = document.getElementById('cykl-koniec-box'); if(c.checked) { b.classList.remove('view-hidden'); document.getElementById('ev-koniec').required = true; } else { b.classList.add('view-hidden'); document.getElementById('ev-koniec').required = false; } } async function obslugaTypuZajec() { let typ = document.getElementById('ev-typ').value; let powBox = document.getElementById('ev-powolania-box'); let listaBox = document.getElementById('ev-lista-zawodnikow'); if (typ === 'mecz') { powBox.classList.remove('view-hidden'); listaBox.innerHTML = 'Ładowanie zawodników...'; try { const u = JSON.parse(localStorage.getItem('zalogowanyUser')); let mKlucz = pobierzIdentyfikatorTrenera(u); const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const mojaGrupa = wszyscy.filter(z => z.rola === 'rodzic' && z.przypisany_trener === mKlucz); listaBox.innerHTML = ''; mojaGrupa.forEach(z => { let inaz = `${z.imie_dziecka} ${z.nazwisko_dziecka}`; listaBox.innerHTML += `<div class="form-check"><input class="form-check-input check-powolanie" type="checkbox" value="${inaz}" id="chk-${z.id}"><label class="form-check-label" for="chk-${z.id}">${inaz}</label></div>`; }); } catch(e) {} } else { powBox.classList.add('view-hidden'); } } document.getElementById('event-form').addEventListener('submit', function(e) { e.preventDefault(); let nazwa = document.getElementById('ev-nazwa').value; let typ = document.getElementById('ev-typ').value; let czasStart = document.getElementById('ev-czas-start').value; let czasKoniec = document.getElementById('ev-czas-koniec').value; let dataKliknieta = document.getElementById('ev-data-kliknieta').value, powtarzaj = document.getElementById('ev-cykl').checked, dataKoniec = document.getElementById('ev-koniec').value; let bgColor = typ === 'mecz' ? '#dc3545' : '#198754'; let noweTreningi = []; let powolaniWykaz = []; if (typ === 'mecz') { document.querySelectorAll('.check-powolanie:checked').forEach(cb => powolaniWykaz.push(cb.value)); } function formatujLokalnie(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; } let aktualnaData = new Date(dataKliknieta + 'T00:00:00'); let koncowaData = dataKoniec ? new Date(dataKoniec + 'T23:59:59') : aktualnaData; while (aktualnaData <= koncowaData) { let sTime = formatujLokalnie(aktualnaData) + 'T' + czasStart + ':00'; let eTime = formatujLokalnie(aktualnaData) + 'T' + czasKoniec + ':00'; noweTreningi.push({ title: nazwa, start: sTime, end: eTime, backgroundColor: bgColor, id: 'temp-' + Math.random() }); if (typ === 'mecz') { let klucz = nazwa + '_' + formatujLokalnie(aktualnaData); bazaPowolan[klucz] = powolaniWykaz; } if (!powtarzaj) break; aktualnaData.setDate(aktualnaData.getDate() + 7); } localStorage.setItem('klubPowolania', JSON.stringify(bazaPowolan)); window.lokalneWydarzenia.push(...noweTreningi); kalendarz.refetchEvents(); zamknijModal(); });
 
-        async function zaladujTreningiDoObecnosci() { const pojemnik = document.getElementById('lista-treningow-obecnosci'); pojemnik.innerHTML = '<div class="text-center py-4">Ładowanie...</div>'; try { const odp = await fetch('http://127.0.0.1:8000/events/'); let zBazy = await odp.json(); let wszystkie = zBazy.map(e => ({ title: e.nazwa, start: e.data_rozpoczecia })); wszystkie = wszystkie.concat(window.lokalneWydarzenia); wszystkie.sort((a,b) => new Date(b.start) - new Date(a.start)); const miesiacePl = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"]; let grupy = {}; wszystkie.forEach(t => { let d = new Date(t.start); let klucz = miesiacePl[d.getMonth()] + ' ' + d.getFullYear(); if(!grupy[klucz]) grupy[klucz] = []; grupy[klucz].push(t); }); pojemnik.innerHTML = ''; for (let [miesiac, treningi] of Object.entries(grupy)) { let html = `<h5 class="fw-bold mt-4 mb-3 text-primary border-bottom pb-2">${miesiac}</h5><div class="row g-3 mb-4">`; treningi.forEach(t => { let d = new Date(t.start); let dataFormat = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} | Godz: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; html += `<div class="col-md-6"><div class="card p-3 shadow-sm training-tile h-100" onclick="otworzKonkretnyTrening('${t.title}', '${dataFormat}')"><div class="fw-bold text-primary">${t.title}</div><div class="text-muted small">${dataFormat}</div></div></div>`; }); html += `</div>`; pojemnik.innerHTML += html; } } catch (e) { } }
-        function otworzKonkretnyTrening(nazwa, data) { document.getElementById('widok-treningow').style.display = 'none'; document.getElementById('widok-listy-obecnosci').style.display = 'block'; document.getElementById('btn-powrot-obecnosci').style.display = 'inline-block'; document.getElementById('naglowek-obecnosci').innerHTML = 'Sprawdzanie obecności'; document.getElementById('obecnosci-trening-info').innerHTML = `Trening: <strong>${nazwa}</strong> (${data})`; async function x() { const user = JSON.parse(localStorage.getItem('zalogowanyUser')); let mKlucz=pobierzIdentyfikatorTrenera(user); try { const odp = await fetch('http://127.0.0.1:8000/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const tbody = document.getElementById('trener-lista-zawodnikow'); tbody.innerHTML = ''; const mojaGrupa = wszyscy.filter(u => u.rola === 'rodzic' && u.przypisany_trener === mKlucz); mojaGrupa.forEach(u => { tbody.innerHTML += `<tr><td class="fw-bold">${u.imie_dziecka} ${u.nazwisko_dziecka}</td><td><select class="form-select form-select-sm w-50"><option value="obecny" selected>🟢 Obecny</option><option value="nieobecny">🔴 Nieobecny</option><option value="usprawiedliwiony">🟡 Uspraw</option></select></td></tr>`; }); } catch(e){} } x(); }
+        async function zaladujTreningiDoObecnosci() { const pojemnik = document.getElementById('lista-treningow-obecnosci'); pojemnik.innerHTML = '<div class="text-center py-4">Ładowanie...</div>'; try { const odp = await fetch('http://lks-lochow-api.onrender.com/events/'); let zBazy = await odp.json(); let wszystkie = zBazy.map(e => ({ title: e.nazwa, start: e.data_rozpoczecia })); wszystkie = wszystkie.concat(window.lokalneWydarzenia); wszystkie.sort((a,b) => new Date(b.start) - new Date(a.start)); const miesiacePl = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"]; let grupy = {}; wszystkie.forEach(t => { let d = new Date(t.start); let klucz = miesiacePl[d.getMonth()] + ' ' + d.getFullYear(); if(!grupy[klucz]) grupy[klucz] = []; grupy[klucz].push(t); }); pojemnik.innerHTML = ''; for (let [miesiac, treningi] of Object.entries(grupy)) { let html = `<h5 class="fw-bold mt-4 mb-3 text-primary border-bottom pb-2">${miesiac}</h5><div class="row g-3 mb-4">`; treningi.forEach(t => { let d = new Date(t.start); let dataFormat = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()} | Godz: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; html += `<div class="col-md-6"><div class="card p-3 shadow-sm training-tile h-100" onclick="otworzKonkretnyTrening('${t.title}', '${dataFormat}')"><div class="fw-bold text-primary">${t.title}</div><div class="text-muted small">${dataFormat}</div></div></div>`; }); html += `</div>`; pojemnik.innerHTML += html; } } catch (e) { } }
+        function otworzKonkretnyTrening(nazwa, data) { document.getElementById('widok-treningow').style.display = 'none'; document.getElementById('widok-listy-obecnosci').style.display = 'block'; document.getElementById('btn-powrot-obecnosci').style.display = 'inline-block'; document.getElementById('naglowek-obecnosci').innerHTML = 'Sprawdzanie obecności'; document.getElementById('obecnosci-trening-info').innerHTML = `Trening: <strong>${nazwa}</strong> (${data})`; async function x() { const user = JSON.parse(localStorage.getItem('zalogowanyUser')); let mKlucz=pobierzIdentyfikatorTrenera(user); try { const odp = await fetch('http://lks-lochow-api.onrender.com/users/', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('klubToken') } }); const wszyscy = await odp.json(); const tbody = document.getElementById('trener-lista-zawodnikow'); tbody.innerHTML = ''; const mojaGrupa = wszyscy.filter(u => u.rola === 'rodzic' && u.przypisany_trener === mKlucz); mojaGrupa.forEach(u => { tbody.innerHTML += `<tr><td class="fw-bold">${u.imie_dziecka} ${u.nazwisko_dziecka}</td><td><select class="form-select form-select-sm w-50"><option value="obecny" selected>🟢 Obecny</option><option value="nieobecny">🔴 Nieobecny</option><option value="usprawiedliwiony">🟡 Uspraw</option></select></td></tr>`; }); } catch(e){} } x(); }
         function pokazMiesiaceTreningow() { document.getElementById('widok-treningow').style.display = 'block'; document.getElementById('widok-listy-obecnosci').style.display = 'none'; document.getElementById('btn-powrot-obecnosci').style.display = 'none'; document.getElementById('naglowek-obecnosci').innerHTML = 'Wybierz trening'; }
 
         function rozwinMenu() { const m = document.getElementById('glowne-menu'), i = document.getElementById('burger-icon'); if (m.classList.contains('menu-hidden')) { m.classList.remove('menu-hidden'); i.className='bi bi-x-lg'; } else { m.classList.add('menu-hidden'); i.className='bi bi-list'; } }
@@ -697,7 +697,7 @@
             const email = document.getElementById('email-input').value, haslo = document.getElementById('haslo-input').value; 
             
             try { 
-                const res = await fetch('http://127.0.0.1:8000/users/login', { 
+                const res = await fetch('http://lks-lochow-api.onrender.com/users/login', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify({ email: email, haslo: haslo }) 
@@ -719,7 +719,7 @@
             } catch (err) {} 
         });
         
-        document.getElementById('register-form').addEventListener('submit', async function(e) { e.preventDefault(); const p = { imie: document.getElementById('reg-imie').value, nazwisko: document.getElementById('reg-nazwisko').value, email: document.getElementById('reg-email').value, haslo: document.getElementById('reg-haslo').value, rola: "rodzic", rocznik_dziecka: parseInt(document.getElementById('reg-rocznik').value), imie_dziecka: document.getElementById('reg-imie-dziecka').value, nazwisko_dziecka: document.getElementById('reg-nazwisko-dziecka').value }; try { const res = await fetch('http://127.0.0.1:8000/users/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if (res.ok) { document.getElementById('register-success').classList.remove('view-hidden'); document.getElementById('register-form').reset(); setTimeout(pokazLogowanie, 2000); } else { const err = await res.json(); document.getElementById('register-error').innerText = err.detail; document.getElementById('register-error').classList.remove('view-hidden'); } } catch (err) {} });
+        document.getElementById('register-form').addEventListener('submit', async function(e) { e.preventDefault(); const p = { imie: document.getElementById('reg-imie').value, nazwisko: document.getElementById('reg-nazwisko').value, email: document.getElementById('reg-email').value, haslo: document.getElementById('reg-haslo').value, rola: "rodzic", rocznik_dziecka: parseInt(document.getElementById('reg-rocznik').value), imie_dziecka: document.getElementById('reg-imie-dziecka').value, nazwisko_dziecka: document.getElementById('reg-nazwisko-dziecka').value }; try { const res = await fetch('http://lks-lochow-api.onrender.com/users/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if (res.ok) { document.getElementById('register-success').classList.remove('view-hidden'); document.getElementById('register-form').reset(); setTimeout(pokazLogowanie, 2000); } else { const err = await res.json(); document.getElementById('register-error').innerText = err.detail; document.getElementById('register-error').classList.remove('view-hidden'); } } catch (err) {} });
         
         sprawdzSesje();
     </script>
