@@ -1,2 +1,9 @@
 venv/
+
+.env
+
+klub.db
+
 __pycache__/
+
+*.pyc

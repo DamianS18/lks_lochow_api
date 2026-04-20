@@ -2,6 +2,9 @@ from sqlalchemy.orm import Session
 from models.user_model import User
 from schemas.user_dto import UserCreate
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
+
 # Funkcja pobierająca jednego użytkownika po ID
 def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
@@ -41,3 +44,4 @@ def delete_user(db: Session, db_user: User):
     db.delete(db_user)
     db.commit()
     return True
+
