@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from database import Base
-import datetime
+from datetime import datetime, timezone
 
 class Attendance(Base):
     __tablename__ = "attendances"
@@ -9,4 +9,4 @@ class Attendance(Base):
     event_id = Column(Integer, ForeignKey("events.id")) # ID treningu
     user_id = Column(Integer, ForeignKey("users.id"))   # ID zawodnika
     status = Column(String, default="zapisany")
-    data_zapisu = Column(DateTime, default=datetime.datetime.utcnow)
+    data_zapisu = Column(DateTime, default=lambda: datetime.now(timezone.utc))

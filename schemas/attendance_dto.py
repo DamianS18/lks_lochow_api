@@ -3,6 +3,7 @@ from datetime import datetime
 
 class AttendanceCreate(BaseModel):
     user_id: int
+    status: str = "obecny"
 
 class AttendanceResponse(BaseModel):
     id: int

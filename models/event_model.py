@@ -9,6 +9,8 @@ class Event(Base):
     data_rozpoczecia = Column(String)
     data_zakonczenia = Column(String)
     typ = Column(String)
+    opis = Column(String, nullable=True)
+    trener_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
 class Oboz(Base):
     __tablename__ = "obozy"

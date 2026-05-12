@@ -1,8 +1,9 @@
 import os
+import secrets
 from pathlib import Path
 from dotenv import load_dotenv
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,7 +13,16 @@ from passlib.context import CryptContext
 
 from database import get_db
 from models.user_model import User, Payment
-from schemas.user_dto import UserCreate, UserResponse, UserLogin, UserBadaniaUpdate, KartaUpdate
+from schemas.user_dto import (
+    KartaUpdate,
+    LoginResponse,
+    PasswordResetRequest,
+    PasswordResetSet,
+    UserBadaniaUpdate,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+)
 
 
 env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -32,9 +42,26 @@ def verify_password(plain_password, hashed_password):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=24)
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def validate_password_strength(password: str):
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Haslo musi miec minimum 6 znakow")
+    if not any(ch.isupper() for ch in password):
+        raise HTTPException(status_code=400, detail="Haslo musi zawierac wielka litere")
+    if not any(ch.isdigit() for ch in password):
+        raise HTTPException(status_code=400, detail="Haslo musi zawierac cyfre")
+
+
+def trener_identifier(user: User) -> str:
+    if user.rola != "trener":
+        return ""
+    if user.przypisany_trener:
+        return f"{user.przypisany_trener} - {user.imie} {user.nazwisko}"
+    return f"{user.imie} {user.nazwisko}"
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Sprawdza token przed wpuszczeniem do funkcji."""
@@ -64,38 +91,68 @@ router = APIRouter(
     tags=["users"]
 )
 
-# 1. REJESTRACJA (Otwarte dla każdego)
+# 1. REJESTRACJA (Otwarte dla każdego – ale TYLKO jako rodzic!)
 @router.post("/", response_model=UserResponse, status_code=201)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == user.email).first()
+    db_user = db.query(User).filter(User.email == str(user.email)).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Ten e-mail jest już zarejestrowany w systemie.")
 
-    # Admin od razu jest aktywny, rodzice czekają na akceptację
-    domyslnie_aktywny = True if user.rola in ["admin", "trener"] else False
+    # BEZPIECZEŃSTWO: Rejestracja ZAWSZE tworzy konto rodzica.
+    # Konta trenerów tworzy admin, konto admina jest jedno i tworzone przy starcie.
+    # Ignorujemy rolę z requestu – zapobiegamy eskalacji uprawnień!
+    validate_password_strength(user.haslo)
     zabezpieczone_haslo = get_password_hash(user.haslo)
 
     nowy_user = User(
         imie=user.imie,
         nazwisko=user.nazwisko,
-        email=user.email,
+        email=str(user.email),
         haslo=zabezpieczone_haslo,
-        rola=user.rola,
+        rola="rodzic",
         rocznik_dziecka=user.rocznik_dziecka,
         imie_dziecka=user.imie_dziecka,
         nazwisko_dziecka=user.nazwisko_dziecka,
         przypisany_trener=None,
-        czy_aktywny=domyslnie_aktywny
+        czy_aktywny=False  # Rodzic ZAWSZE czeka na akceptację admina
     )
     db.add(nowy_user)
     db.commit()
     db.refresh(nowy_user)
     return nowy_user
 
+# 1b. TWORZENIE KONTA TRENERA (Tylko admin!)
+@router.post("/admin/utworz-trenera", response_model=UserResponse, status_code=201)
+def create_trener(user: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # ZABEZPIECZENIE: Tylko admin może tworzyć konta trenerów
+    if current_user.rola != "admin":
+        raise HTTPException(status_code=403, detail="Tylko admin może tworzyć konta trenerów")
+    
+    db_user = db.query(User).filter(User.email == str(user.email)).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Ten e-mail jest już zarejestrowany w systemie.")
+
+    validate_password_strength(user.haslo)
+    zabezpieczone_haslo = get_password_hash(user.haslo)
+
+    nowy_trener = User(
+        imie=user.imie,
+        nazwisko=user.nazwisko,
+        email=str(user.email),
+        haslo=zabezpieczone_haslo,
+        rola="trener",
+        przypisany_trener=None,
+        czy_aktywny=True  # Trener aktywny od razu (tworzony przez admina)
+    )
+    db.add(nowy_trener)
+    db.commit()
+    db.refresh(nowy_trener)
+    return nowy_trener
+
 # 2. LOGOWANIE (Otwarte dla każdego)
-@router.post("/login")
+@router.post("/login", response_model=LoginResponse)
 def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == user.email).first()
+    db_user = db.query(User).filter(User.email == str(user.email)).first()
     
     if not db_user or not verify_password(user.haslo, db_user.haslo):
         raise HTTPException(status_code=401, detail="Błędne dane logowania")
@@ -111,9 +168,84 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         "user": db_user
     }
 
+@router.post("/reset-hasla/prosba")
+def popros_o_reset_hasla(reset: PasswordResetRequest, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == str(reset.email)).first()
+    if db_user:
+        db_user.reset_hasla_requested = True
+        db_user.reset_hasla_approved = False
+        db_user.reset_hasla_token_hash = None
+        db_user.reset_hasla_expires_at = None
+        db.commit()
+    return {"wiadomosc": "Jesli konto istnieje, prosba trafila do administratora."}
+
+@router.patch("/{user_id}/reset-hasla/akceptuj")
+def zaakceptuj_reset_hasla(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if current_user.rola != "admin":
+        raise HTTPException(status_code=403, detail="Tylko admin moze akceptowac reset hasla")
+
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono uzytkownika")
+
+    reset_code = f"{secrets.randbelow(1_000_000):06d}"
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
+
+    db_user.reset_hasla_requested = True
+    db_user.reset_hasla_approved = True
+    db_user.reset_hasla_token_hash = get_password_hash(reset_code)
+    db_user.reset_hasla_expires_at = expires_at.isoformat()
+    db.commit()
+    return {
+        "wiadomosc": "Reset hasla zaakceptowany",
+        "kod": reset_code,
+        "wygasa_o": db_user.reset_hasla_expires_at,
+    }
+
+@router.patch("/reset-hasla/ustaw")
+def ustaw_nowe_haslo(reset: PasswordResetSet, db: Session = Depends(get_db)):
+    if reset.nowe_haslo != reset.powtorz_haslo:
+        raise HTTPException(status_code=400, detail="Hasla nie sa identyczne")
+    validate_password_strength(reset.nowe_haslo)
+
+    db_user = db.query(User).filter(User.email == str(reset.email)).first()
+    if not db_user or not db_user.reset_hasla_approved:
+        raise HTTPException(status_code=403, detail="Administrator nie zaakceptowal resetu hasla")
+    if not db_user.reset_hasla_token_hash or not db_user.reset_hasla_expires_at:
+        raise HTTPException(status_code=403, detail="Kod resetu nie jest aktywny")
+    try:
+        expires_at = datetime.fromisoformat(db_user.reset_hasla_expires_at)
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Kod resetu jest nieprawidlowy")
+    if expires_at < datetime.now(timezone.utc):
+        db_user.reset_hasla_requested = False
+        db_user.reset_hasla_approved = False
+        db_user.reset_hasla_token_hash = None
+        db_user.reset_hasla_expires_at = None
+        db.commit()
+        raise HTTPException(status_code=403, detail="Kod resetu wygasl. Popros administratora o nowy kod.")
+    if not verify_password(reset.kod, db_user.reset_hasla_token_hash):
+        raise HTTPException(status_code=403, detail="Nieprawidlowy kod resetu")
+
+    db_user.haslo = get_password_hash(reset.nowe_haslo)
+    db_user.reset_hasla_requested = False
+    db_user.reset_hasla_approved = False
+    db_user.reset_hasla_token_hash = None
+    db_user.reset_hasla_expires_at = None
+    db.commit()
+    return {"wiadomosc": "Haslo zostalo zmienione. Mozesz sie zalogowac."}
+
 @router.get("/", response_model=List[UserResponse])
 def get_all_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(User).all()
+    if current_user.rola == "admin":
+        return db.query(User).all()
+    if current_user.rola == "trener":
+        identyfikator = trener_identifier(current_user)
+        return db.query(User).filter(
+            (User.id == current_user.id) |
+            ((User.rola == "rodzic") & (User.przypisany_trener == identyfikator))
+        ).all()
+    return db.query(User).filter(User.id == current_user.id).all()
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

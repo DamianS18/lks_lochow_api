@@ -12,9 +12,11 @@ def get_events(db: Session, typ: str = None):
 def get_event_by_id(db: Session, event_id: int):
     return db.query(Event).filter(Event.id == event_id).first()
 
-def create_event(db: Session, event: EventCreate):
-    # Prosty trik z użyciem ** to rozpakowanie całego DTO do Modelu bazy
-    db_event = Event(**event.model_dump())
+def create_event(db: Session, event: EventCreate, trener_id: int = None):
+    db_event = Event(
+        **event.model_dump(),
+        trener_id=trener_id
+    )
     db.add(db_event)
     db.commit()
     db.refresh(db_event)

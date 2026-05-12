@@ -25,6 +25,10 @@ class User(Base):
     rozmiar_dresu = Column(String, nullable=True)
     alergie = Column(String, nullable=True)
     telefon_ice = Column(String, nullable=True)
+    reset_hasla_requested = Column(Boolean, default=False)
+    reset_hasla_approved = Column(Boolean, default=False)
+    reset_hasla_token_hash = Column(String, nullable=True)
+    reset_hasla_expires_at = Column(String, nullable=True)
 
 class Payment(Base):
     __tablename__ = "payments"

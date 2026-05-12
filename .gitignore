@@ -3,6 +3,8 @@ venv/
 .env
 
 klub.db
+klub_lks.db
+*.db
 
 __pycache__/
 
