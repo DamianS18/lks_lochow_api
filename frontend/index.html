@@ -50,14 +50,16 @@
             <div class="elegant-center-text">
                 <div class="hero-logo"><i class="bi bi-shield-shaded"></i></div>
                 <h1>Wychowujemy Mistrzów</h1>
-                <a href="#sec-kontakt" class="hero-cta" onclick="przewinDoSekcji('sec-kontakt'); return false;">Dołącz do nas</a>
+                <a href="#sec-kontakt" class="hero-cta" onclick="przewinDoSekcji('sec-kontakt'); return false;">Dołącz
+                    do nas</a>
             </div>
         </section>
 
         <section id="sec-onas" class="home-section content-section">
             <div class="section-card">
                 <h2><i class="bi bi-info-circle me-2"></i>O nas</h2>
-                <p>Prowadzimy grupy dziecięce 2012-2015, treningi techniczne, mecze kontrolne i obozy letnie. Stawiamy na regularność, bezpieczeństwo i dobrą komunikację z rodzicami.</p>
+                <p>Prowadzimy grupy dziecięce 2012-2015, treningi techniczne, mecze kontrolne i obozy letnie. Stawiamy
+                    na regularność, bezpieczeństwo i dobrą komunikację z rodzicami.</p>
                 <div class="section-pills">
                     <span class="public-pill"><i class="bi bi-calendar-week"></i> Treningi 3x tygodniowo</span>
                     <span class="public-pill"><i class="bi bi-award"></i> Kadra UEFA Grassroots</span>
@@ -69,7 +71,8 @@
         <section id="sec-aktualnosci" class="home-section content-section">
             <div class="section-card">
                 <h2><i class="bi bi-newspaper me-2"></i>Aktualności</h2>
-                <p>Najbliższy tydzień: sparing rocznika 2014, otwarty trening naborowy oraz zapisy na letni obóz klubowy. Szczegóły pojawią się w panelu po zalogowaniu.</p>
+                <p>Najbliższy tydzień: sparing rocznika 2014, otwarty trening naborowy oraz zapisy na letni obóz
+                    klubowy. Szczegóły pojawią się w panelu po zalogowaniu.</p>
                 <div class="section-pills">
                     <span class="public-pill"><i class="bi bi-door-open"></i> Nabór otwarty</span>
                     <span class="public-pill"><i class="bi bi-sun"></i> Obóz letni</span>
@@ -81,18 +84,23 @@
         <section id="sec-kontakt" class="home-section content-section">
             <div class="section-card">
                 <h2><i class="bi bi-geo-alt me-2"></i>Kontakt</h2>
-                <p>Boisko klubowe: ul. Sportowa 7, Łochów.<br>Telefon organizacyjny: 500 123 456.<br>E-mail: kontakt@lkslochow.pl<br>Godziny biura: wtorek i czwartek 17:00-19:00.</p>
+                <p>Boisko klubowe: Aleja Łochowska 20, Łochów.<br>Telefon organizacyjny: 500 123 456.<br>E-mail:
+                    kontakt@lkslochow.pl<br>Godziny biura: wtorek i czwartek 17:00-19:00.</p>
                 <div class="section-pills">
-                    <span class="public-pill"><i class="bi bi-geo-alt-fill"></i> ul. Sportowa 7</span>
-                    <span class="public-pill"><i class="bi bi-telephone-fill"></i> 500 123 456</span>
-                    <span class="public-pill"><i class="bi bi-envelope-fill"></i> kontakt@lkslochow.pl</span>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Aleja+Łochowska+20+Łochów" target="_blank"
+                        class="public-pill">
+                        <i class="bi bi-geo-alt-fill"></i> Aleja Łochowska 20</a>
+                    <a href="tel:+48 500 123 456" class="public-pill"><i class="bi bi-telephone-fill"></i> 500 123
+                        456</a>
+                    <a href="mailto:kontakt@lkslochow.pl" class="public-pill"><i
+                            class="bi bi-envelope-fill"></i>kontakt@lkslochow.pl</a>
                 </div>
             </div>
         </section>
     </div>
     <script>
         // Fallback: pokaż stronę startową natychmiast jeśli użytkownik nie jest zalogowany
-        (function() {
+        (function () {
             var user = localStorage.getItem('zalogowanyUser');
             var token = localStorage.getItem('klubToken');
             console.log('[DEBUG] inline fallback - user:', user, 'token:', token);
@@ -119,8 +127,8 @@
                 <div class="mb-4"><label class="form-label fw-bold small">HASŁO</label><input type="password"
                         id="haslo-input" class="form-control form-control-lg" required></div>
                 <button type="submit" class="btn btn-success btn-lg w-100 fw-bold mb-3">Zaloguj się</button>
-                <button type="button" class="btn btn-link w-100 small text-success"
-                    onclick="otworzResetHasla()">Nie pamiętasz hasła?</button>
+                <button type="button" class="btn btn-link w-100 small text-success" onclick="otworzResetHasla()">Nie
+                    pamiętasz hasła?</button>
                 <div class="text-center mt-4 border-top pt-3">
                     <p class="small text-muted mb-2">Rodzicu, nie masz jeszcze konta?</p><button type="button"
                         class="btn btn-outline-success w-100" onclick="pokazRejestracje()">Zarejestruj się</button>
@@ -149,14 +157,11 @@
                     <div class="col-md-6 mb-3"><label class="form-label fw-bold small">NAZWISKO DZIECKA</label><input
                             type="text" id="reg-nazwisko-dziecka" class="form-control" required></div>
                 </div>
-                <div class="mb-3"><label class="form-label fw-bold small">ROCZNIK DZIECKA</label><select
-                        id="reg-rocznik" class="form-select" required>
-                        <option value="" disabled selected>Wybierz rocznik...</option>
-                        <option value="2012">2012</option>
-                        <option value="2013">2013</option>
-                        <option value="2014">2014</option>
-                        <option value="2015">2015</option>
-                    </select></div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">ROCZNIK DZIECKA</label>
+                    <input type="number" id="reg-rocznik" class="form-control" placeholder="Wpisz rocznik (np. 2015)"
+                        min="2000" required>
+                </div>
                 <div class="border-top pt-3 mt-1">
                     <div class="mb-3"><label class="form-label fw-bold small">ADRES E-MAIL</label><input type="email"
                             id="reg-email" class="form-control" required></div>
@@ -761,8 +766,8 @@
             <div class="reset-tabs" role="tablist" aria-label="Reset hasła">
                 <button type="button" id="reset-tab-request" class="reset-tab active"
                     onclick="przelaczResetHasla('request')">Prośba</button>
-                <button type="button" id="reset-tab-set" class="reset-tab"
-                    onclick="przelaczResetHasla('set')">Nowe hasło</button>
+                <button type="button" id="reset-tab-set" class="reset-tab" onclick="przelaczResetHasla('set')">Nowe
+                    hasło</button>
             </div>
             <form id="reset-request-form" class="mt-3" onsubmit="wyslijProsbeResetu(event)">
                 <label class="form-label small fw-bold" for="reset-email">E-mail konta</label>
@@ -800,8 +805,8 @@
     <div id="toast-container"></div>
     <div id="offline-indicator" class="offline-bar view-hidden"><i class="bi bi-wifi-off"></i> Brak połączenia z
         internetem</div>
-    <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Otwórz menu panelu"><i
-            class="bi bi-list"></i></button>
+    <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleMobileSidebar()"
+        aria-label="Otwórz menu panelu"><i class="bi bi-list"></i></button>
 </body>
 
 </html>

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 
@@ -150,23 +150,42 @@ def create_trener(user: UserCreate, db: Session = Depends(get_db), current_user:
     return nowy_trener
 
 # 2. LOGOWANIE (Otwarte dla każdego)
-@router.post("/login", response_model=LoginResponse)
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == str(user.email)).first()
+@router.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # 1. Szukamy użytkownika w bazie po emailu (Swagger przesyła email w polu 'username')
+    db_user = db.query(User).filter(User.email == form_data.username).first()
     
-    if not db_user or not verify_password(user.haslo, db_user.haslo):
-        raise HTTPException(status_code=401, detail="Błędne dane logowania")
+    # 2. Weryfikacja: Czy użytkownik istnieje i czy hasło jest poprawne
+    # Zakładam, że masz funkcję verify_password i pole w bazie o nazwie 'haslo'
+    if not db_user or not verify_password(form_data.password, db_user.haslo):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Błędny e-mail lub hasło"
+        )
     
+    # 3. Sprawdzenie czy konto jest aktywne
     if not db_user.czy_aktywny:
-        raise HTTPException(status_code=403, detail="Twoje konto czeka na akceptację przez Administratora.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Konto oczekuje na akceptację przez administratora"
+        )
         
+    # 4. Generowanie tokena JWT
     token = create_access_token(data={"sub": str(db_user.id), "rola": db_user.rola})
     
+    # 5. Zwrócenie danych (Kluczowe dla frontendu: obiekt 'user')
     return {
         "access_token": token, 
-        "token_type": "bearer", 
-        "user": db_user
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.id,
+            "email": db_user.email,
+            "rola": db_user.rola,
+            "imie": db_user.imie,     # Pobierze "Główny"
+            "nazwisko": db_user.nazwisko # Pobierze "Administrator"
+        }
     }
+
 
 @router.post("/reset-hasla/prosba")
 def popros_o_reset_hasla(reset: PasswordResetRequest, db: Session = Depends(get_db)):
